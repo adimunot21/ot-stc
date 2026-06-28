@@ -35,25 +35,52 @@ episode 0 (lerobot 0.4.4), T=303, 30 fps. Figure:
    plan's "one-step lag" wording — on this hardware/recording the follower trails
    the command by roughly four control steps.
 
-## Implication for the OT cost matrix
+## Decision (PRELIMINARY)
 
-The time-augmented OT cost (R1: append `λ·t`) penalises cross-time matches, so a
-raw ~4-step offset between Lᵉ and Fᵉ would register as *fidelity loss* even when
-the follower is tracking perfectly, just delayed. Two options for Phase 2:
+The lag is **uniform across all six joints** (same k, ~133 ms). That uniformity is
+the key: a per-joint mechanical fault would show *different* lags per joint. A
+common offset on every joint is **common-mode pipeline latency** (teleop read →
+command → actuation → state read), i.e. a property of the *recording rig*, not a
+per-demo execution flaw. So:
 
-- **(a) Align then score:** shift `state[t+k]` ↔ `action[t]` (k from the pilot)
-  so the score measures tracking *error*, not constant latency.
-- **(b) Score raw:** treat latency as part of "fidelity" the policy should learn
-  from. Simpler, but conflates latency with error.
+- **Remove it as a single global constant before scoring.** Shift
+  `state[t+k] ↔ action[t]` with one k applied to every episode and every joint,
+  then the OT score measures genuine tracking *error*, not constant latency.
+  Without this, the time-augmented cost (R1: append `λ·t`, which penalises
+  cross-time matches) would read a perfectly-tracking-but-delayed follower as
+  fidelity loss.
+- **Never fit k per-episode.** A per-episode (or per-joint) best-fit k would
+  absorb real lateness into the alignment and *launder out exactly the badness we
+  want to measure* — a demo where the follower genuinely lagged the command would
+  be silently re-aligned to look clean. One global k only.
 
-**Leaning toward (a)** given the lag is large and joint-consistent. The loader
-(`io/dataset.py`) returns **raw, unaligned** arrays by design; any shift is applied
-downstream so the choice stays explicit. Make `lag` a tunable in
-`config/experiment.yaml` and ablate it.
+### How the shift is applied (Phase 2)
+
+1. Latency is stored in **milliseconds** (`ot.lag_ms` in `config/experiment.yaml`)
+   so it survives an fps change. Steps are derived:
+   `k = round(lag_ms * fps / 1000)` (133 ms @ 30 fps → k = 4).
+2. Shift `follower[k:]` against `leader[:-k]` (state trails the command),
+   then **truncate both to the overlap window** (length `T − k`).
+3. Apply **per-joint z-scoring *after* alignment** (R5), so standardisation uses
+   the aligned, truncated window — not the raw, misaligned series.
+
+The loader (`io/dataset.py`) still returns **raw, unaligned** arrays by design; the
+shift lives downstream in the scorer so the choice stays explicit and auditable.
+
+## Diagnostic note (separate from the curation score)
+
+The uniform latency is itself a **reportable hardware-profile result**: "this
+SO101 teleop rig trails the leader by ~133 ms (≈4 steps @ 30 fps), consistently
+across all joints." It is reported *independently* of the per-episode quality
+score (which is computed *after* the latency is removed). The two answer different
+questions — rig latency characterises the setup; the OT score characterises each
+demonstration's execution fidelity given that setup.
 
 ## To do on the pilot (blocks Phase 2)
 
 - [ ] Re-run `scripts/01_inspect_alignment.py <pilot_repo> <ep>` on ≥3 pilot
-      episodes; confirm k is stable (expect ~constant, hardware-dependent).
-- [ ] Decide (a) vs (b); set `ot.lag` in `experiment.yaml`.
-- [ ] Update this file's status to FINAL with the chosen k and rationale.
+      episodes; confirm k is **stable across episodes** and still uniform across
+      joints (expect ~constant; the absolute value is hardware-dependent and may
+      differ from the public dataset's k=4).
+- [ ] Set `ot.lag_ms` in `experiment.yaml` to the confirmed pilot latency.
+- [ ] Update this file's status to **FINAL** with the chosen `lag_ms` and rationale.

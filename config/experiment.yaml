@@ -1,4 +1,15 @@
-ot: {sinkhorn_reg: 0.01, cost: sqeuclidean, time_augment: true, time_weight: 1.0, per_joint_standardise: true, numItermax: 2000}
+ot:
+  sinkhorn_reg: 0.01           # entropic regularisation for sinkhorn2; small => closer to exact EMD
+  cost: sqeuclidean            # ground cost between (aligned, z-scored) joint vectors
+  time_augment: true           # append normalised time channel (R1) to preserve temporal order
+  time_weight: 1.0             # lambda: weight of the time channel; ablate
+  per_joint_standardise: true  # z-score each joint AFTER alignment (R5; gripper scale differs)
+  numItermax: 2000             # sinkhorn iteration cap
+  # R4: common-mode leader->follower pipeline latency, removed as a SINGLE GLOBAL
+  # constant before scoring (never fit per-episode). Stored in ms so it survives
+  # an fps change; steps = round(lag_ms * fps / 1000)  (133 ms @ 30 fps ~= 4 steps).
+  # PRELIMINARY value from one public episode — confirm stable across pilot episodes.
+  lag_ms: 133
 curation: {keep_fraction: 0.5, diversity_weight: 0.5, random_seed: 42}
 manifold: {method: umap, n_neighbors: 15, min_dist: 0.1}
 training: {policy: act, seeds: [0,1,2,3,4], steps: 100000, batch_size: 8, conditions: [A_full, B_random50, C_quality50, D_quality_diversity50, E_weighted_full]}
