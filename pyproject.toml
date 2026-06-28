@@ -32,3 +32,6 @@ ignore = ["E501"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src"]
+markers = [
+    "network: test requires downloading from the HF Hub (skipped if offline)",
+]
