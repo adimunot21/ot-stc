@@ -1,0 +1,26 @@
+Metadata-Version: 2.4
+Name: ot-stc
+Version: 0.1.0
+Summary: Optimal Transport Stratified Curation of teleoperation demonstrations for the SO101 arm
+Requires-Python: <3.11,>=3.10
+Description-Content-Type: text/markdown
+Requires-Dist: POT>=0.9.4
+Requires-Dist: umap-learn>=0.5.6
+Requires-Dist: scikit-learn>=1.4
+Requires-Dist: numpy<2.2,>=1.26
+Requires-Dist: scipy>=1.11
+Requires-Dist: pandas>=2.1
+Requires-Dist: pyarrow>=15.0
+Requires-Dist: matplotlib>=3.8
+Requires-Dist: seaborn>=0.13
+Requires-Dist: pyyaml>=6.0
+Requires-Dist: python-dotenv>=1.0
+Requires-Dist: tqdm>=4.66
+Provides-Extra: dev
+Requires-Dist: pytest>=8.0; extra == "dev"
+Requires-Dist: ruff>=0.5; extra == "dev"
+Requires-Dist: ipykernel>=6.29; extra == "dev"
+
+# OT-STC
+Optimal Transport Stratified Curation of teleoperation demonstrations for the LeRobot SO101 arm.
+See `docs/PROJECT_PLAN.md`. Quickstart: `conda activate ot-stc && python scripts/00_check_setup.py`

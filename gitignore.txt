@@ -1,0 +1,59 @@
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.eggs/
+*.egg
+
+# ---- Virtual envs ----
+.venv/
+venv/
+env/
+.conda/
+
+# ---- Env / secrets ----
+.env
+*.key
+
+# ---- Jupyter ----
+.ipynb_checkpoints/
+notebooks/*.html
+
+# ---- ML / experiment outputs ----
+wandb/
+outputs/
+checkpoints/
+*.ckpt
+*.pth
+*.safetensors
+
+# ---- Robot data (large; lives in the HF cache or on the Hub) ----
+data/raw/*
+!data/raw/.gitkeep
+data/curated/
+*.parquet
+*.mp4
+*.arrow
+
+# Keep small result summaries, ignore heavy artifacts
+experiments/results/*
+!experiments/results/.gitkeep
+!experiments/results/*.csv
+!experiments/results/*.json
+
+# ---- OS / editor ----
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# ---- Caches ----
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/

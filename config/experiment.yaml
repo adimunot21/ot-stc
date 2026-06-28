@@ -1,0 +1,5 @@
+ot: {sinkhorn_reg: 0.01, cost: sqeuclidean, time_augment: true, time_weight: 1.0, per_joint_standardise: true, numItermax: 2000}
+curation: {keep_fraction: 0.5, diversity_weight: 0.5, random_seed: 42}
+manifold: {method: umap, n_neighbors: 15, min_dist: 0.1}
+training: {policy: act, seeds: [0,1,2,3,4], steps: 100000, batch_size: 8, conditions: [A_full, B_random50, C_quality50, D_quality_diversity50, E_weighted_full]}
+evaluation: {trials_per_condition: 50, perturbation_radius_cm: 3}

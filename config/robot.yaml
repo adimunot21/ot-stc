@@ -1,0 +1,7 @@
+# Find ports:  lerobot-find-port   | Find cameras: lerobot-find-cameras opencv
+follower: {type: so101_follower, port: /dev/ttyACM0, id: ot_stc_follower}
+leader:   {type: so101_leader,   port: /dev/ttyACM1, id: ot_stc_leader}
+cameras:
+  overhead: {type: opencv, index_or_path: 0, width: 640, height: 480, fps: 30}
+  wrist:    {type: opencv, index_or_path: 2, width: 640, height: 480, fps: 30}
+record: {fps: 30, task: "place the cube in the bowl", num_episodes: 100, episode_time_s: 20, reset_time_s: 10}
